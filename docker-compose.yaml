@@ -1,4 +1,20 @@
 services:
+  reverse-proxy:
+    image: traefik:v3.3
+    ports:
+      - "80:80"
+      - "443:443" 
+      # - "8080:8080" # remove in production only for debugging
+    environment:
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./data/certs:/var/certs/:rw # for storing SSL certificates
+    networks:
+      - web-external
+    restart: unless-stopped
+
   fxserver:
     build:
       context: .
@@ -10,15 +26,27 @@ services:
     ports:
       - "30120:30120/tcp"
       - "30120:30120/udp"
-      - "40120:40120"
     volumes:
       - txdata:/opt/fxserver/server/txData
       - server-data:/opt/fxserver/server-data
     environment:
       - TERM=xterm
+    networks:
+      - web-external
+    labels:
+      - "traefik.enable=true"
+      # txAdmin Web UI
+      - "traefik.http.routers.txadmin.rule=Host(`diamondrush.online`)"
+      - "traefik.http.routers.txadmin.entrypoints=websecure"
+      - "traefik.http.routers.txadmin.tls.certresolver=cloudflare"
+      - "traefik.http.services.txadmin.loadbalancer.server.port=40120"
 
 volumes:
   txdata:
     driver: local
   server-data:
     driver: local
+
+networks:
+  web-external:
+    external: true

@@ -47,7 +47,6 @@ RUN chmod +x /opt/fxserver/entrypoint.sh
 
 WORKDIR /opt/fxserver
 
-USER fxserver
 
 EXPOSE 30120/tcp 30120/udp 40120
 
