@@ -1,0 +1,21 @@
+services:
+  fxserver:
+    build:
+      context: .
+      dockerfile: dockerfile
+    container_name: fxserver-redm
+    restart: unless-stopped
+    stdin_open: true     
+    tty: true
+    ports:
+      - "30120:30120/tcp"   
+      - "30120:30120/udp"  
+      - "40120:40120" 
+    volumes:
+      - txdata:/opt/fxserver/txData
+    environment:
+      - TERM=xterm
+
+volumes:
+  txdata:
+    driver: local
