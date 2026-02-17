@@ -15,20 +15,6 @@ services:
       - web-external
     restart: unless-stopped
 
-  mariadb:
-    image: mariadb:10.11
-    container_name: mariadb-redm
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - web-external
-
   fxserver:
     build:
       context: .
@@ -45,7 +31,6 @@ services:
       - server-data:/opt/fxserver/server-data
     environment:
       - TERM=xterm
-      - MYSQL_CONNECTION_STRING=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mariadb/${MYSQL_DATABASE}
     networks:
       - web-external
     labels:
@@ -60,8 +45,6 @@ volumes:
   txdata:
     driver: local
   server-data:
-    driver: local
-  mariadb_data:
     driver: local
 
 networks:
