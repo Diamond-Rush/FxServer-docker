@@ -13,7 +13,7 @@
         "Latest": "ghcr.io\/diamond-rush\/fxserver-docker:latest"
     },
     "file_denylist": [],
-    "startup": ".\/alpine\/opt\/cfx-server\/ld-musl-x86_64.so.1 --library-path \".\/alpine\/usr\/lib\/v8\/:.\/alpine\/lib\/:.\/alpine\/usr\/lib\/\" -- .\/alpine\/opt\/cfx-server\/FXServer +set citizen_dir .\/alpine\/opt\/cfx-server\/citizen\/",
+    "startup": "$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1 --library-path \"$(pwd)/alpine/usr/lib/v8/:$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/\" -- $(pwd)/alpine/opt/cfx-server/FXServer +set citizen_dir $(pwd)/alpine/opt/cfx-server/citizen/ +set txAdminPort {{TXADMIN_PORT}}",
     "config": {
         "files": "{}",
         "startup": "{\r\n    \"done\": \"txAdmin v\"\r\n}",
@@ -22,8 +22,8 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/bash\necho \"Installation is handled dynamically at startup by the container entrypoint.\"",
-            "container": "alpine:latest",
+            "script": "#!/bin/bash\necho \"Installation is handled dynamically at startup by the container entrypoint.\"",
+            "container": "ghcr.io/pterodactyl/installers:debian",
             "entrypoint": "bash"
         }
     },

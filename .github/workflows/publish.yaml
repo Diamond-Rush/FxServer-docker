@@ -3,6 +3,10 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'redm.json'
+      - 'egg-*.json'
+      - 'README.md'
 
 jobs:
   build-and-push:
