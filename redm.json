@@ -1,0 +1,62 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-07-03T20:07:15+05:30",
+    "name": "RedM (txAdmin)",
+    "author": "ht266005@gmail.com",
+    "description": "RedM server, fully optimized with txAdmin support. Uses a dynamic artifact downloader to keep the image lightweight.",
+    "features": [],
+    "docker_images": {
+        "Latest": "ghcr.io\/diamond-rush\/fxserver-docker:latest"
+    },
+    "file_denylist": [],
+    "startup": ".\/alpine\/opt\/cfx-server\/ld-musl-x86_64.so.1 --library-path \".\/alpine\/usr\/lib\/v8\/:.\/alpine\/lib\/:.\/alpine\/usr\/lib\/\" -- .\/alpine\/opt\/cfx-server\/FXServer +set citizen_dir .\/alpine\/opt\/cfx-server\/citizen\/",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"txAdmin v\"\r\n}",
+        "logs": "{}",
+        "stop": "^c"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\necho \"Installation is handled dynamically at startup by the container entrypoint.\"",
+            "container": "alpine:latest",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "RedM Version",
+            "description": "The specific build version string of RedM to run. Get this from the FiveM Artifacts page. (e.g. 25770-8ddccd4e4dfd6a760ce18651656463f961cc4761)",
+            "env_variable": "FXSERVER_VERSION",
+            "default_value": "25770-8ddccd4e4dfd6a760ce18651656463f961cc4761",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:100",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Type",
+            "description": "Set to either 'fivem' or 'redm'",
+            "env_variable": "FXSERVER_TYPE",
+            "default_value": "redm",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:fivem,redm",
+            "field_type": "text"
+        },
+        {
+            "name": "txAdmin Port",
+            "description": "The port to run the txAdmin web interface on. (You must assign this port to the server in Pterodactyl!)",
+            "env_variable": "TXADMIN_PORT",
+            "default_value": "40120",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1024,65535",
+            "field_type": "text"
+        }
+    ]
+}

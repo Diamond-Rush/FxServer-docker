@@ -24,7 +24,7 @@ FXSERVER_TYPE="${FXSERVER_TYPE:-fivem}"
 # Map type to artifact URL path
 case "${FXSERVER_TYPE}" in
     redm)
-        ARTIFACT_BASE_URL="https://runtime.fivem.net/artifacts/redm/build_proot_linux/master"
+        ARTIFACT_BASE_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master"
         ;;
     fivem|*)
         ARTIFACT_BASE_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master"
