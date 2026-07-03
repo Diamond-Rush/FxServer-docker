@@ -1,7 +1,10 @@
 .git
 .gitignore
-config/
+.env
+.env.example
+.dockerignore
+docker-compose.yaml
+egg-fxserver.json
 README.md
 LICENSE
 *.md
-.dockerignore

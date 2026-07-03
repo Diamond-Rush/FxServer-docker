@@ -1,53 +1,34 @@
-FROM ubuntu:24.04 AS builder
+FROM ubuntu:24.04
 
-ARG FXSERVER_VERSION=25770-8ddccd4e4dfd6a760ce18651656463f961cc4761
+LABEL maintainer="iharsh02" \
+    description="FXServer (FiveM/RedM) with txAdmin - Pterodactyl compatible" \
+    version="2.0"
 
+# Install only the minimal runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
-    xz-utils \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /build
-
-RUN curl -fsSL \
-    "https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${FXSERVER_VERSION}/fx.tar.xz" \
-    -o fx.tar.xz \
-    && mkdir -p /opt/fxserver/server \
-    && tar xf fx.tar.xz -C /opt/fxserver/server \
-    && rm fx.tar.xz
-
-FROM ubuntu:24.04 AS runtime
-
-LABEL maintainer="iharsh02" \
-    description="FXServer (RedM) with txAdmin" \
-    version="1.0"
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ca-certificates \
     git \
+    jq \
+    tar \
     xz-utils \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && rm -f /root/.bash_history
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN groupadd -g 1001 fxserver && \
-    useradd -u 1001 -g fxserver -m -s /bin/bash fxserver
+# Pterodactyl requires a 'container' user with UID 1000 and home at /home/container
+# Ubuntu 24.04 already has an 'ubuntu' user with UID 1000, so we remove it first
+RUN userdel -r ubuntu || true && \
+    useradd -m -d /home/container -u 1000 -s /bin/bash container
 
-COPY --from=builder /opt/fxserver/server /opt/fxserver/server
+USER container
+ENV USER=container \
+    HOME=/home/container
+WORKDIR /home/container
 
-RUN mkdir -p /opt/fxserver/server-data \
-    /opt/fxserver/txData && \
-    chown -R fxserver:fxserver /opt/fxserver
+COPY --chown=container:container entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-COPY --chown=fxserver:fxserver entrypoint.sh /opt/fxserver/entrypoint.sh
-RUN chmod +x /opt/fxserver/entrypoint.sh
+EXPOSE 30120/tcp 30120/udp 40120/tcp
 
-WORKDIR /opt/fxserver
-
-
-EXPOSE 30120/tcp 30120/udp 40120
-
-ENTRYPOINT ["/opt/fxserver/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

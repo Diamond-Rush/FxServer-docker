@@ -1,52 +1,26 @@
+# Local testing only
 services:
-  reverse-proxy:
-    image: traefik:v3.6
-    ports:
-      - "80:80"
-      - "443:443" 
-      # - "8080:8080" # remove in production only for debugging
-    environment:
-      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
-      - ./data/certs:/var/certs/:rw # for storing SSL certificates
-    networks:
-      - web-external
-    restart: unless-stopped
-
   fxserver:
     build:
       context: .
       dockerfile: dockerfile
-    container_name: fxserver-redm
+    container_name: fxserver
     restart: unless-stopped
     stdin_open: true
     tty: true
     ports:
       - "30120:30120/tcp"
       - "30120:30120/udp"
+      - "40120:40120/tcp"
     volumes:
-      - txdata:/opt/fxserver/server/txData
-      - server-data:/opt/fxserver/server-data
+      - server-data:/home/container
+    env_file:
+      - .env
     environment:
       - TERM=xterm
-    networks:
-      - web-external
-    labels:
-      - "traefik.enable=true"
-      # txAdmin Web UI
-      - "traefik.http.routers.txadmin.rule=Host(`diamondrush.online`)"
-      - "traefik.http.routers.txadmin.entrypoints=websecure"
-      - "traefik.http.routers.txadmin.tls.certresolver=cloudflare"
-      - "traefik.http.services.txadmin.loadbalancer.server.port=40120"
+      # Simulates what Pterodactyl sets as the STARTUP command
+      - STARTUP=$(pwd)/alpine/opt/cfx-server/ld-musl-x86_64.so.1 --library-path "$(pwd)/alpine/usr/lib/v8/:$(pwd)/alpine/lib/:$(pwd)/alpine/usr/lib/" -- $(pwd)/alpine/opt/cfx-server/FXServer +set citizen_dir $(pwd)/alpine/opt/cfx-server/citizen/
 
 volumes:
-  txdata:
-    driver: local
   server-data:
     driver: local
-
-networks:
-  web-external:
-    external: true
